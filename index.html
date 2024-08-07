@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stepper Component</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        background: #ff6f72;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: bold;
+        font-size: 80px;
+        font-family: "Roboto", sans-serif;
+        overflow: hidden;
+      }
+
+      .wrap {
+        display: flex;
+        align-items: center;
+      }
+
+      .stepper {
+        &.vertical {
+          position: relative;
+          text-align: center;
+          width: 300px;
+          height: 300px;
+
+          .arrow {
+            width: 70px;
+            opacity: 0.5;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            position: relative;
+
+            &:hover {
+              opacity: 1;
+            }
+
+            &.top {
+              transform: rotate(90deg);
+              top: 25px;
+            }
+
+            &.bottom {
+              transform: rotate(-90deg);
+              margin-top: 16px;
+              top: -20px;
+            }
+          }
+          .box {
+            overflow: hidden;
+            height: 92px;
+            position: relative;
+            padding: 10px 0;
+
+            &::before {
+              content: "";
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              height: 20px;
+              background: linear-gradient(
+                to bottom,
+                rgba(255, 111, 114, 1) 0%,
+                rgba(125, 185, 232, 0) 100%
+              );
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff6f72', endColorstr='#007db9e8',GradientType=0 );
+              z-index: 1;
+            }
+
+            &::after {
+              content: "";
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              height: 20px;
+              background: linear-gradient(
+                to bottom,
+                rgba(255, 111, 114, 1) 0%,
+                rgba(125, 185, 232, 0) 100%
+              );
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff6f72', endColorstr='#007db9e8',GradientType=0 );
+              z-index: 1;
+              transform: rotate(180deg);
+            }
+
+            span {
+              display: inline-block;
+              letter-spacing: 1px;
+              user-select: none;
+            }
+
+            .numbers1 {
+              position: absolute;
+              top: 12px;
+              left: 80px;
+              display: flex;
+
+              span {
+                transform: translateY(0);
+              }
+            }
+
+            .numbers2 {
+              position: absolute;
+              top: 12px;
+              left: 80px;
+              display: flex;
+
+              span {
+                transform: translateY(90px);
+              }
+            }
+          }
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="stepper vertical" data-start="255">
+        <img
+          src="https://alikinvv.github.io/stepper/build/img/arrow.svg"
+          class="arrow top"
+          alt=""
+        />
+        <div class="box">
+          <div class="numbers1 active">
+            <span>2</span>
+            <span>5</span>
+            <span>5</span>
+          </div>
+          <div class="numbers2">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <img
+          src="https://alikinvv.github.io/stepper/build/img/arrow.svg"
+          class="arrow bottom"
+          alt=""
+        />
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script>
+      let number = document
+        .querySelector(".stepper.vertical")
+        .getAttribute("data-start");
+      let tl = anime.timeline();
+      let trigger = true;
+
+      let eachNumberDelay = 20;
+      let speed = 1100;
+
+      $("body").on("click", ".vertical .arrow.top", () => {
+        if (trigger) {
+          trigger = false;
+          number++;
+
+          setTimeout(() => {
+            trigger = true;
+          }, 400);
+
+          setNumbers(number, ".vertical");
+
+          tl.pause();
+
+          tl = anime.timeline();
+
+          tl.add({
+            targets: ".vertical .box > div:not(.active) span",
+            translateY: 95,
+            duration: 0,
+          })
+            .add({
+              targets: ".vertical .box > div.active span",
+              translateY: -95,
+              delay: anime.stagger(eachNumberDelay),
+              duration: speed,
+            })
+            .add(
+              {
+                targets: ".vertical .box > div:not(.active) span",
+                translateY: 0,
+                delay: anime.stagger(eachNumberDelay),
+                duration: speed,
+              },
+              "-=" + speed * 1.06
+            );
+
+          changeClass(".vertical");
+        }
+      });
+
+      $("body").on("click", ".vertical .arrow.bottom", () => {
+        if (trigger) {
+          trigger = false;
+          number--;
+
+          setTimeout(() => {
+            trigger = true;
+          }, 400);
+
+          setNumbers(number, ".vertical");
+
+          tl.pause();
+
+          tl = anime.timeline();
+
+          tl.add({
+            targets: ".vertical .box > div:not(.active) span",
+            translateY: -95,
+            duration: 0,
+          })
+            .add({
+              targets: ".vertical .box > div.active span",
+              translateY: 95,
+              delay: anime.stagger(eachNumberDelay),
+              duration: speed,
+            })
+            .add(
+              {
+                targets: ".vertical .box > div:not(.active) span",
+                translateY: 0,
+                delay: anime.stagger(eachNumberDelay),
+                duration: speed,
+              },
+              "-=" + speed * 1.06
+            );
+
+          changeClass(".vertical");
+        }
+      });
+
+      let setNumbers = (number, direction) => {
+        $(".stepper" + direction + " .box > div:not(.active)").html("");
+
+        for (char of number.toString()) {
+          $(".stepper" + direction + " .box > div:not(.active)").append(
+            "<span>" + char + "</span>"
+          );
+        }
+      };
+
+      let changeClass = (direction) => {
+        if ($(".stepper" + direction + " .numbers1").hasClass("active")) {
+          $(".stepper" + direction + " .numbers1").removeClass("active");
+          $(".stepper" + direction + " .numbers2").addClass("active");
+        } else {
+          $(".stepper" + direction + " .numbers2").removeClass("active");
+          $(".stepper" + direction + " .numbers1").addClass("active");
+        }
+      };
+    </script>
+  </body>
+</html>
